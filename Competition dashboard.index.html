@@ -1,0 +1,850 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Biotech, Biology & Sustainability Competitions Directory — Executive Dashboard</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600&family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --paper:#EFEDE6;
+    --panel:#FBFAF6;
+    --ink:#14213D;
+    --ink-soft:#4A5578;
+    --line:#D8D4C6;
+    --gold:#B8862F;
+    --gold-deep:#8C6521;
+    --gold-bg:#FBF1DD;
+    --teal:#1E6F63;
+    --teal-deep:#124A42;
+    --teal-bg:#E2F0EC;
+    --coral:#C1443C;
+    --coral-bg:#F9E4E2;
+    --green:#2E7D46;
+    --green-bg:#E4F1E7;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0;
+    background:var(--paper);
+    color:var(--ink);
+    font-family:'Inter',sans-serif;
+    -webkit-font-smoothing:antialiased;
+  }
+  .wrap{max-width:1180px;margin:0 auto;padding:0 32px 80px;}
+
+  /* ===== Header ===== */
+  header{
+    padding:56px 32px 44px;
+    background:var(--ink);
+    color:var(--panel);
+    position:relative;
+    overflow:hidden;
+  }
+  header .wrap{padding:0;max-width:1180px;}
+  .eyebrow{
+    font-family:'IBM Plex Mono',monospace;
+    font-size:12px;
+    letter-spacing:.14em;
+    text-transform:uppercase;
+    color:var(--gold);
+    margin:0 0 14px;
+  }
+  h1{
+    font-family:'Fraunces',serif;
+    font-weight:500;
+    font-size:clamp(32px,4.2vw,50px);
+    line-height:1.08;
+    margin:0 0 16px;
+    max-width:760px;
+  }
+  header p.sub{
+    font-size:15.5px;
+    color:#C6CCE0;
+    max-width:620px;
+    line-height:1.6;
+    margin:0;
+  }
+  .snapshot-tag{
+    display:inline-flex;align-items:center;gap:8px;
+    margin-top:24px;
+    font-family:'IBM Plex Mono',monospace;
+    font-size:12px;
+    color:var(--paper);
+    background:rgba(255,255,255,.08);
+    border:1px solid rgba(255,255,255,.18);
+    padding:6px 14px;
+    border-radius:999px;
+  }
+  .snapshot-tag .dot{width:6px;height:6px;border-radius:50%;background:var(--gold);}
+
+  /* ===== KPI Strip ===== */
+  .kpis{
+    display:grid;
+    grid-template-columns:repeat(6,1fr);
+    gap:1px;
+    background:var(--line);
+    border:1px solid var(--line);
+    margin-top:-1px;
+    transform:translateY(-1px);
+  }
+  .kpi{
+    background:var(--panel);
+    padding:22px 18px;
+    text-align:left;
+  }
+  .kpi .num{
+    font-family:'IBM Plex Mono',monospace;
+    font-weight:600;
+    font-size:30px;
+    color:var(--ink);
+    line-height:1;
+  }
+  .kpi .lbl{
+    margin-top:8px;
+    font-size:11.5px;
+    color:var(--ink-soft);
+    letter-spacing:.02em;
+  }
+  .kpi.accent-gold .num{color:var(--gold-deep);}
+  .kpi.accent-teal .num{color:var(--teal-deep);}
+  .kpi.accent-green .num{color:var(--green);}
+
+  @media (max-width:900px){
+    .kpis{grid-template-columns:repeat(3,1fr);}
+  }
+  @media (max-width:560px){
+    .kpis{grid-template-columns:repeat(2,1fr);}
+  }
+
+  /* ===== Section headings ===== */
+  .section-head{
+    display:flex;
+    align-items:baseline;
+    justify-content:space-between;
+    margin:56px 0 20px;
+    flex-wrap:wrap;
+    gap:10px;
+  }
+  .section-head h2{
+    font-family:'Fraunces',serif;
+    font-weight:500;
+    font-size:24px;
+    margin:0;
+  }
+  .section-head .hint{
+    font-size:12.5px;
+    color:var(--ink-soft);
+    font-family:'IBM Plex Mono',monospace;
+  }
+
+  /* ===== Timeline strip ===== */
+  .timeline{
+    position:relative;
+    background:var(--panel);
+    border:1px solid var(--line);
+    border-radius:14px;
+    padding:26px 28px 22px;
+    overflow-x:auto;
+  }
+  .timeline-track{
+    position:relative;
+    height:6px;
+    background:var(--line);
+    border-radius:3px;
+    margin:34px 0 10px;
+    min-width:900px;
+  }
+  .timeline-months{
+    display:flex;
+    justify-content:space-between;
+    min-width:900px;
+    font-family:'IBM Plex Mono',monospace;
+    font-size:11px;
+    color:var(--ink-soft);
+  }
+  .tl-marker{
+    position:absolute;
+    top:-9px;
+    width:16px;height:16px;
+    border-radius:50%;
+    border:3px solid var(--panel);
+    cursor:pointer;
+    transition:transform .15s ease;
+  }
+  .tl-marker:hover{transform:scale(1.35);}
+  .tl-marker.intl{background:var(--gold);}
+  .tl-marker.natl{background:var(--teal);}
+
+  /* ===== Filters ===== */
+  .filters{
+    display:flex;
+    flex-wrap:wrap;
+    gap:10px;
+    align-items:center;
+    margin-bottom:26px;
+  }
+  .filter-group{display:flex;gap:6px;flex-wrap:wrap;}
+  .chip{
+    font-family:'Inter',sans-serif;
+    font-size:12.5px;
+    font-weight:500;
+    padding:8px 15px;
+    border-radius:999px;
+    border:1px solid var(--line);
+    background:var(--panel);
+    color:var(--ink-soft);
+    cursor:pointer;
+    transition:all .15s ease;
+    white-space:nowrap;
+  }
+  .chip:hover{border-color:var(--ink);color:var(--ink);}
+  .chip.active{
+    background:var(--ink);
+    color:var(--panel);
+    border-color:var(--ink);
+  }
+  .filters .divider{width:1px;height:20px;background:var(--line);margin:0 4px;}
+  .search-box{
+    flex:1;min-width:180px;
+    display:flex;align-items:center;gap:8px;
+    background:var(--panel);
+    border:1px solid var(--line);
+    border-radius:999px;
+    padding:8px 15px;
+  }
+  .search-box input{
+    border:none;outline:none;background:transparent;
+    font-family:'Inter',sans-serif;font-size:13px;color:var(--ink);
+    width:100%;
+  }
+  .search-box svg{flex-shrink:0;opacity:.5;}
+
+  .result-count{
+    font-family:'IBM Plex Mono',monospace;
+    font-size:12px;
+    color:var(--ink-soft);
+    margin-bottom:16px;
+  }
+
+  .quarter-legend{
+    display:flex;
+    flex-wrap:wrap;
+    gap:6px 18px;
+    align-items:center;
+    font-size:12px;
+    color:var(--ink-soft);
+    margin:0 0 18px;
+    padding:10px 16px;
+    background:var(--panel);
+    border:1px solid var(--line);
+    border-radius:10px;
+  }
+  .quarter-legend strong{
+    font-family:'IBM Plex Mono',monospace;
+    color:var(--ink);
+    margin-right:4px;
+  }
+  .quarter-legend span:last-child{
+    flex-basis:100%;
+    font-style:italic;
+    font-size:11.5px;
+    margin-top:2px;
+  }
+
+  /* ===== Cards ===== */
+  .cards{display:flex;flex-direction:column;gap:14px;}
+  .card{
+    display:flex;
+    background:var(--panel);
+    border:1px solid var(--line);
+    border-radius:14px;
+    overflow:hidden;
+    transition:box-shadow .18s ease, border-color .18s ease;
+  }
+  .card:hover{border-color:var(--ink-soft);}
+  .ribbon{
+    width:104px;
+    flex-shrink:0;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    justify-content:center;
+    padding:14px 8px;
+    text-align:center;
+    color:var(--panel);
+  }
+  .ribbon.intl{background:var(--gold-deep);}
+  .ribbon.natl{background:var(--teal-deep);}
+  .ribbon .days{
+    font-family:'IBM Plex Mono',monospace;
+    font-weight:600;
+    font-size:26px;
+    line-height:1;
+  }
+  .ribbon .days-lbl{
+    font-size:9.5px;
+    text-transform:uppercase;
+    letter-spacing:.08em;
+    margin-top:6px;
+    opacity:.85;
+  }
+  .ribbon .scope-lbl{
+    font-family:'IBM Plex Mono',monospace;
+    font-size:9.5px;
+    text-transform:uppercase;
+    letter-spacing:.1em;
+    margin-top:12px;
+    padding-top:10px;
+    border-top:1px solid rgba(255,255,255,.3);
+    width:100%;
+  }
+
+  .card-body{padding:20px 24px;flex:1;min-width:0;}
+  .card-top{
+    display:flex;
+    justify-content:space-between;
+    align-items:flex-start;
+    gap:14px;
+    flex-wrap:wrap;
+  }
+  .card-title{
+    font-family:'Fraunces',serif;
+    font-weight:500;
+    font-size:19px;
+    margin:0 0 4px;
+    line-height:1.25;
+  }
+  .card-org{
+    font-size:12.5px;
+    color:var(--ink-soft);
+    margin:0 0 12px;
+  }
+  .badges{display:flex;gap:6px;flex-wrap:wrap;}
+  .badge{
+    font-size:10.5px;
+    font-weight:600;
+    padding:4px 10px;
+    border-radius:999px;
+    letter-spacing:.02em;
+    white-space:nowrap;
+  }
+  .badge.cat-academic{background:var(--teal-bg);color:var(--teal-deep);}
+  .badge.cat-industrial{background:var(--gold-bg);color:var(--gold-deep);}
+  .badge.status-open{background:var(--green-bg);color:var(--green);}
+  .badge.status-closed{background:#EEECE4;color:var(--ink-soft);}
+  .badge.status-tba{background:var(--coral-bg);color:var(--coral);}
+  .badge.quarter-badge{background:#EAE7DC;color:var(--ink-soft);}
+
+  .join-select{
+    font-family:'IBM Plex Mono',monospace;
+    font-size:11px;
+    font-weight:600;
+    padding:6px 10px;
+    border-radius:999px;
+    border:1px solid var(--line);
+    background:var(--panel);
+    color:var(--ink);
+    cursor:pointer;
+  }
+  .join-select.j-joined{background:var(--green-bg);color:var(--green);border-color:var(--green);}
+  .join-select.j-registered{background:#D9E8FB;color:#1F5FA8;border-color:#1F5FA8;}
+  .join-select.j-considering{background:var(--gold-bg);color:var(--gold-deep);border-color:var(--gold-deep);}
+  .join-select.j-declined{background:var(--coral-bg);color:var(--coral);border-color:var(--coral);}
+  .join-select.j-notjoined{background:#EEECE4;color:var(--ink-soft);border-color:var(--line);}
+
+  .desc{
+    font-size:13.5px;
+    line-height:1.65;
+    color:var(--ink);
+    margin:14px 0 16px;
+  }
+
+  .fact-grid{
+    display:grid;
+    grid-template-columns:repeat(2,1fr);
+    gap:10px 24px;
+    margin-bottom:14px;
+    padding-top:14px;
+    border-top:1px solid var(--line);
+  }
+  .fact{font-size:12.5px;}
+  .fact .k{
+    color:var(--ink-soft);
+    font-family:'IBM Plex Mono',monospace;
+    font-size:10.5px;
+    text-transform:uppercase;
+    letter-spacing:.06em;
+    display:block;
+    margin-bottom:3px;
+  }
+  .fact .v{line-height:1.5;}
+
+  .timeline-mini{
+    display:flex;
+    gap:20px;
+    flex-wrap:wrap;
+    padding-top:12px;
+    border-top:1px solid var(--line);
+    margin-bottom:14px;
+  }
+  .tm-item{font-size:12px;}
+  .tm-item .k{
+    color:var(--ink-soft);
+    font-family:'IBM Plex Mono',monospace;
+    font-size:10px;
+    text-transform:uppercase;
+    letter-spacing:.06em;
+    display:block;
+    margin-bottom:2px;
+  }
+  .tm-item .v{font-weight:600;font-family:'IBM Plex Mono',monospace;font-size:13px;}
+  .tm-item .note{display:block;color:var(--ink-soft);font-weight:400;font-family:'Inter',sans-serif;font-size:11.5px;margin-top:2px;max-width:260px;}
+
+  .card-foot{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    gap:12px;
+    flex-wrap:wrap;
+  }
+  .prize{
+    font-size:12.5px;
+    color:var(--ink);
+  }
+  .prize strong{color:var(--gold-deep);}
+  .visit-link{
+    font-family:'IBM Plex Mono',monospace;
+    font-size:11.5px;
+    font-weight:600;
+    color:var(--ink);
+    text-decoration:none;
+    border:1px solid var(--ink);
+    padding:8px 16px;
+    border-radius:999px;
+    white-space:nowrap;
+    transition:all .15s ease;
+  }
+  .visit-link:hover{background:var(--ink);color:var(--panel);}
+
+  .empty-state{
+    text-align:center;
+    padding:60px 20px;
+    color:var(--ink-soft);
+    font-size:14px;
+  }
+
+  footer{
+    margin-top:60px;
+    padding-top:22px;
+    border-top:1px solid var(--line);
+    font-size:11.5px;
+    color:var(--ink-soft);
+    line-height:1.7;
+  }
+
+  @media (max-width:640px){
+    .ribbon{width:78px;}
+    .fact-grid{grid-template-columns:1fr;}
+    header{padding:40px 20px 32px;}
+    .wrap{padding:0 20px 60px;}
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="wrap">
+    <p class="eyebrow">Biotechnology · Biology · Environmental · AI-in-Biology · SDGs — Competition Directory</p>
+    <h1>Biotech &amp; sustainability competitions,<br>tracked and ranked by deadline.</h1>
+    <p class="sub">A managerial directory of national (Egypt) and international competitions in biotechnology, biology, waste treatment, environmental sustainability, AI-based biology, and the SDGs — what each one is, who can enter, exactly when to act, and whether we've joined.</p>
+    <div class="snapshot-tag"><span class="dot"></span><span id="liveDateTag">Loading…</span></div>
+  </div>
+</header>
+
+<div class="kpis" id="kpiStrip"></div>
+
+<div class="wrap">
+
+  <div class="section-head">
+    <h2>Milestone timeline</h2>
+    <span class="hint" id="tlHint">gold = international, teal = national (Egypt)</span>
+  </div>
+  <div class="timeline">
+    <div class="timeline-months" id="tlMonths"></div>
+    <div class="timeline-track" id="tlTrack"></div>
+  </div>
+
+  <div class="section-head">
+    <h2>Directory</h2>
+    <span class="hint" id="resultHint"></span>
+  </div>
+  <p class="quarter-legend">
+    <span><strong>Q1</strong> Jan–Mar</span>
+    <span><strong>Q2</strong> Apr–Jun</span>
+    <span><strong>Q3</strong> Jul–Sep</span>
+    <span><strong>Q4</strong> Oct–Dec</span>
+    <span>Grouped by each competition's published registration/event quarter, not by when we list it here.</span>
+  </p>
+
+  <div class="filters">
+    <div class="filter-group" id="scopeFilters"></div>
+    <div class="divider"></div>
+    <div class="filter-group" id="catFilters"></div>
+    <div class="divider"></div>
+    <div class="filter-group" id="quarterFilters"></div>
+    <div class="divider"></div>
+    <div class="filter-group" id="sortFilters"></div>
+    <div class="search-box">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
+      <input type="text" id="searchInput" placeholder="Search by name, field, or organizer…">
+    </div>
+  </div>
+
+  <div class="cards" id="cardContainer"></div>
+  <div class="empty-state" id="emptyState" style="display:none;">No competitions match these filters — try clearing search or filters.</div>
+
+  <footer>
+    Scope: biotechnology, biology, waste treatment, environmental sustainability, AI-based biology, and SDG-aligned
+    competitions only — general engineering/ICT competitions are intentionally excluded. Directory compiled from
+    official competition websites and press materials as of August 9, 2026. Dates marked "approximate" follow the
+    prior year's cycle pattern where the current cycle had not yet been published; verify against the linked
+    website before committing budget, travel, or faculty time. For competitions whose 2026 window has closed, the
+    card shows the most recent cycle as a reference point for planning the next one. The "Did we join?" selector
+    saves within this session/browser where supported; the Excel workbook's "Did We Join?" column is the durable
+    record of record for tracking participation over time.
+  </footer>
+
+</div>
+
+<script id="data" type="application/json">[{"name": "Scientific Operation Leaders in Egypt (SOLE)", "category": "Academic", "field": "Biotechnology", "scope": "National (Egypt)", "organizer": "Creative Egyptian \nBiotechnologists (CEB)", "description": "SOLE is a national biotechnology competition that brings together undergraduate students from universities across Egypt to compete in a variety of scientific and professional challenges. The competition features events such as scientific projects, case studies, entrepreneurship, scientific debates, presentation skills, and science communication, allowing participants to demonstrate their technical knowledge, critical thinking, teamwork, and communication abilities.", "eligibility": "University undergraduate students", "teamSize": "Team/Individual", "status": "Closed for 2026", "regOpens": "2025-10-01", "regOpensNote": null, "regDeadline": "2025-10-01", "regDeadlineNote": null, "eventStart": "2026-02-01", "eventEnd": "2026-02-01", "eventNote": null, "location": "AUC - New Cairo\n(The venue is changed according the hosting institute \"CEB\") ", "prize": "1st, 2nd, 3rd, and 4th place medals, special track and category prizes", "website": "https://www.ceb-eg.com/sole-2026", "joined": "Joined", "quarter": "Quarter (1) -  January - March"}, {"name": "Enactus World Cup (+ Egypt National Round)", "category": "Industrial", "field": "Social Entrepreneurship / SDGs", "scope": "International (Egypt National Round feeds in)", "organizer": "Enactus (global) / Enactus Egypt", "description": "University teams run year-round social-enterprise projects addressing the UN Sustainable Development Goals — many rooted in environmental and biological sciences (bio-pesticides, agri-waste valorization, clean water) — then pitch to executive judges nationally, with champions advancing to the Enactus World Cup. Egypt is a five-time World Cup winner.", "eligibility": "Enrolled university students, team-based (Enactus campus chapters)", "teamSize": "Team", "status": "Egypt round concluded — World Cup Nov 16-19, 2026", "regOpens": null, "regOpensNote": "announced according to region", "regDeadline": null, "regDeadlineNote": "announced according to region", "eventStart": "2026-11-16", "eventEnd": "2026-11-19", "eventNote": null, "location": "Enactus World Cup 2026 — São Paulo, Brazil, Nov 16-19, 2026", "prize": "Egypt (national round) + São Paulo, Brazil (World Cup)", "website": "https://enactusegypt.org/", "joined": "Not Joined", "quarter": "Quarter (2) -  April - June"}, {"name": "CASP17 (Critical Assessment of protein Structure Prediction)", "category": "Academic", "field": "AI-Based Biology / Computational Structural Biology", "scope": "International", "organizer": "Protein Structure Prediction Center (CASP/CAPRI community)", "description": "The world's benchmark competition for AI-driven protein structure prediction. Teams submit computational models (built on deep-learning methods such as AlphaFold-style architectures) to predict protein, RNA/DNA, and complex structures, independently scored against experimentally solved targets.", "eligibility": "Research groups and teams worldwide, including university labs; open registration", "teamSize": "Team / research group", "status": "Season open (through Aug 2026)", "regOpens": "2026-04-27", "regOpensNote": null, "regDeadline": "2026-08-31", "regDeadlineNote": null, "eventStart": null, "eventEnd": null, "eventNote": "to be announced — To be announced", "location": "Fully virtual — submissions via the Prediction Center portal", "prize": "Recognition as top-performing method/group; publication in Proteins journal", "website": "https://predictioncenter.org/casp17/index.cgi", "joined": "Not Joined", "quarter": "Quarter (2) -  April - June"}, {"name": "Undergraduate Research Forum (UGRF)", "category": "Industrial", "field": "Biotechnology", "scope": "National (Egypt)", "organizer": "Nile University", "description": "UGRF is a national undergraduate research competition that provides university students with a platform to showcase innovative research projects, prototypes, applications, and graduation projects across a wide range of disciplines. Participants present their work through research summaries, posters, demonstrations, and presentations, which are evaluated by a panel of university professors and senior researchers.", "eligibility": "University undergraduate students", "teamSize": "Not available", "status": "Closed for 2026", "regOpens": "2026-06-01", "regOpensNote": null, "regDeadline": "2026-06-01", "regDeadlineNote": null, "eventStart": "2026-08-01", "eventEnd": "2026-08-01", "eventNote": null, "location": "Nile University", "prize": "Recognition + Cash prizes", "website": "https://ugrf.nu.edu.eg/", "joined": "Considering", "quarter": "Quarter (3) -  July - September"}, {"name": "BioX Challenge", "category": "Academic", "field": "Biotechnology", "scope": "National (Egypt)", "organizer": "BGE Journey", "description": "BIO-X Challenge is an online biotechnology competition designed for undergraduate students in biotechnology and related life science disciplines. Participants compete individually or in teams through multiple rounds featuring multiple-choice questions, case-based problem solving, and knockout challenges that assess scientific knowledge, analytical thinking, and innovation.", "eligibility": "University undergraduate students", "teamSize": "Individual  or up to 4 members", "status": "Closed for 2026", "regOpens": "2026-07-01", "regOpensNote": null, "regDeadline": "2026-07-30", "regDeadlineNote": null, "eventStart": "2026-08-01", "eventEnd": "2026-08-01", "eventNote": null, "location": "Online", "prize": "Recognition + Certificates", "website": "www.bgejourney.com", "joined": "Joined", "quarter": "Quarter (3) -  July - September"}, {"name": "Biotechnology Innovative Competition (BIC)", "category": "Industrial", "field": "Biotechnology", "scope": "National (Egypt)", "organizer": "Faculty of Biotechnology at MSA University / Armed Forces Veterinary Hospital", "description": "The Biotechnology Innovative Competition (BIC) is a student-focused competition designed to encourage innovation and creativity in biotechnology by providing university students with an opportunity to present innovative biotechnology ideas and applications before a panel of experts. The competition brings together students from different Egyptian universities and covers diverse areas of biotechnology, including medical and pharmaceutical biotechnology, genetic engineering, agricultural biotechnology, veterinary applications, and sustainable bioprocessing. Participants present their ideas within a limited time before a judging committee, which evaluates the projects and selects the top-performing participants.", "eligibility": "University undergraduate students", "teamSize": "Individual", "status": "The last edition was held in 2023 and the competition has been on halt since then", "regOpens": null, "regOpensNote": "Not available", "regDeadline": null, "regDeadlineNote": "Not available", "eventStart": null, "eventEnd": null, "eventNote": "Not available", "location": "MSA University", "prize": "Not available", "website": "Not available", "joined": "Considering", "quarter": "Quarter (4) -  October - December"}, {"name": "Cairo Water Week - Best Graduation Projects", "category": "Industrial", "field": "Water Resources & Sustainability", "scope": "National (Egypt)", "organizer": "Egyptian Ministry of Water Resources and Irrigation (MWRI)", "description": "The Cairo Water Week Best Graduation Project Competition (BGP) is an annual competition that showcases outstanding final-year undergraduate graduation projects addressing water-related challenges. Open to graduating students from public and private universities across all disciplines, the competition encourages innovative and multidisciplinary solutions related to areas such as water-resource management, infrastructure, agriculture, environmental sustainability, and community water access. Projects are evaluated based on factors including innovation, potential impact, feasibility and cost-effectiveness, sustainability, environmental impact, applicability, and multidisciplinary integration. Selected teams have the opportunity to present their work to water-sector experts, decision-makers, and international organizations, while outstanding projects may also be considered for further development or funding.", "eligibility": "University undergraduate students", "teamSize": "Not available", "status": "Confirmed", "regOpens": "2026-07-15", "regOpensNote": null, "regDeadline": "2026-08-15", "regDeadlineNote": null, "eventStart": "2026-10-26", "eventEnd": "2026-10-29", "eventNote": null, "location": "Triumph Luxury Hotel, Cairo", "prize": "Recognition + Funding", "website": "https://www.cairowaterweek.eg/register/", "joined": "Considering", "quarter": "Quarter (4) -  October - December"}, {"name": "iGEM Competition (Synthetic Biology)", "category": "Academic", "field": "Synthetic Biology / Bioengineering", "scope": "International", "organizer": "iGEM Foundation", "description": "The premier global synthetic-biology competition. University teams run a year-long Design-Build-Test-Learn engineering-biology project, then present research, a team wiki and a poster at the Grand Jamboree, competing for medals across dozens of award tracks spanning health, environment, and food & nutrition.", "eligibility": "University undergraduate/graduate teams with institutional PI", "teamSize": "Team, institution-affiliated", "status": "Closed for 2026 — event date Nov 13-16", "regOpens": null, "regOpensNote": null, "regDeadline": "2026-06-04", "regDeadlineNote": null, "eventStart": "2026-11-13", "eventEnd": "2026-11-16", "eventNote": null, "location": "Paris Expo Porte de Versailles, France", "prize": "Gold/Silver/Bronze medals, special track and category prizes", "website": "https://competition.igem.org/", "joined": "Not Joined", "quarter": "Quarter (4) -  October - December"}, {"name": "CrocTank", "category": "Industrial", "field": "Biotechnology", "scope": "National (Egypt)", "organizer": "Nile University", "description": "CrocTank is Egypt's first specialized biotechnology pitch competition, designed to empower university students and young innovators to transform scientific ideas into viable entrepreneurial ventures. Organized by the School of Biotechnology at Nile University in collaboration with its Innovation, Entrepreneurship and Competitiveness Center (IECC), the competition focuses on innovative solutions in healthcare, agriculture, and industrial biotechnology. Participants receive training in pitching and business development before presenting their projects to a panel of academic and industry experts, where they are evaluated based on innovation, feasibility, market potential, and societal impact.", "eligibility": "University undergraduate students", "teamSize": "Not available", "status": "Unconfirmed", "regOpens": null, "regOpensNote": "To be updated", "regDeadline": null, "regDeadlineNote": "To be updated", "eventStart": null, "eventEnd": null, "eventNote": "To be updated (Expected Nov. 2026)", "location": "Nile University", "prize": "Recognition + Cash prizes", "website": "https://competition.igem.org/", "joined": "Considering", "quarter": "Quarter (4) -  October - December"}, {"name": "University Waste Management Competition (\"Save It… Light It Up\")", "category": "Academic", "field": "Waste Treatment / Environmental Sustainability", "scope": "National (Egypt)", "organizer": "Egyptian Ministry of Higher Education & Scientific Research + Innovators and Geniuses Support Fund", "description": "A newly launched national competition under Egypt's 'Save It… Light It Up' sustainable-energy campaign, challenging Egyptian university and institute students to design innovative, implementable waste-management solutions for their own campuses.", "eligibility": "Students at Egyptian universities and institutes", "teamSize": "Not available", "status": "Newly launched (announced late May 2026) — registration timeline not yet published. ", "regOpens": null, "regOpensNote": "To be announced", "regDeadline": null, "regDeadlineNote": "To be announced", "eventStart": null, "eventEnd": null, "eventNote": "To be announced", "location": "Egyptian public universities", "prize": "Recognition + implementation support from the Innovators and Geniuses Support Fund", "website": "https://mohesr.gov.eg/en/all-news/university-waste-management-competition-launched-under-the-save-it%E2%80%A6-light-it-up-campaign-to-promote-innovation-and-sustainability-in-egyptian-universities", "joined": "Not Joined", "quarter": "Newly Launched"}]</script>
+<script>
+const DATA = JSON.parse(document.getElementById('data').textContent);
+// TODAY tracks the real current date (recomputed on load and refreshed
+// periodically below) so every countdown stays accurate without editing this file.
+function getToday(){
+  const d = new Date();
+  d.setHours(0,0,0,0);
+  return d;
+}
+let TODAY = getToday();
+
+function updateLiveDateTag(){
+  const el = document.getElementById('liveDateTag');
+  if(el){
+    el.textContent = 'Live — today is ' + TODAY.toLocaleDateString('en-US',{month:'long',day:'numeric',year:'numeric'});
+  }
+}
+
+function parseDate(s){ return s ? new Date(s+'T00:00:00') : null; }
+function fmtDate(s){
+  if(!s) return null;
+  const d = parseDate(s);
+  return d.toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'});
+}
+function daysFrom(d){
+  return Math.round((d - TODAY) / 86400000);
+}
+function isNational(scope){ return scope.indexOf('Egypt') !== -1 || scope.indexOf('National') === 0; }
+
+function nextAction(c){
+  const cands = [];
+  if(c.regOpens){ const d = parseDate(c.regOpens); if(d >= TODAY) cands.push({date:d, label:'Registration opens'}); }
+  if(c.regDeadline){ const d = parseDate(c.regDeadline); if(d >= TODAY) cands.push({date:d, label:'Registration deadline'}); }
+  if(c.eventStart){ const d = parseDate(c.eventStart); if(d >= TODAY) cands.push({date:d, label:'Event begins'}); }
+  if(cands.length === 0) return null;
+  cands.sort((a,b)=>a.date-b.date);
+  return cands[0];
+}
+
+// ---------- KPIs ----------
+const total = DATA.length;
+const intlCount = DATA.filter(c=>c.scope.startsWith('International')).length;
+const natlCount = DATA.filter(c=>isNational(c.scope)).length;
+const acadCount = DATA.filter(c=>c.category==='Academic').length;
+const indCount = DATA.filter(c=>c.category==='Industrial').length;
+const openCount = DATA.filter(c=>/open/i.test(c.status)).length;
+
+const kpis = [
+  {num:total, lbl:'Total tracked', cls:''},
+  {num:intlCount, lbl:'International', cls:'accent-gold'},
+  {num:natlCount, lbl:'National (Egypt)', cls:'accent-teal'},
+  {num:acadCount, lbl:'Academic track', cls:''},
+  {num:indCount, lbl:'Industrial track', cls:''},
+  {num:openCount, lbl:'Open / opening now', cls:'accent-green'},
+];
+document.getElementById('kpiStrip').innerHTML = kpis.map(k =>
+  `<div class="kpi ${k.cls}"><div class="num">${k.num}</div><div class="lbl">${k.lbl}</div></div>`
+).join('') + `<div class="kpi accent-green"><div class="num" id="kpiJoined">0</div><div class="lbl">Joined so far</div></div>`;
+
+function refreshJoinedKpi(){
+  const joinedCount = DATA.filter(c=>c.joined==='Joined').length;
+  const kpiEl = document.getElementById('kpiJoined');
+  if(kpiEl) kpiEl.textContent = joinedCount;
+}
+refreshJoinedKpi();
+
+// ---------- Timeline strip (rebuilt on every render so it tracks TODAY) ----------
+function renderTimeline(){
+  const tlStart = new Date(TODAY);
+  const tlEnd = new Date(TODAY);
+  tlEnd.setMonth(tlEnd.getMonth() + 6);
+  const tlSpan = tlEnd - tlStart;
+
+  const months = [];
+  const cursor = new Date(tlStart);
+  for(let i=0;i<7;i++){
+    months.push(cursor.toLocaleDateString('en-US',{month:'short'}));
+    cursor.setMonth(cursor.getMonth()+1);
+  }
+  document.getElementById('tlMonths').innerHTML = months.map(m=>`<span>${m}</span>`).join('');
+  document.getElementById('tlHint').textContent =
+    `${tlStart.toLocaleDateString('en-US',{month:'short',year:'numeric'})} → ${tlEnd.toLocaleDateString('en-US',{month:'short',year:'numeric'})} · gold = international, teal = national (Egypt)`;
+
+  let markerHtml = '';
+  DATA.forEach((c,i)=>{
+    const na = nextAction(c);
+    if(!na || na.date > tlEnd) return;
+    const pct = Math.max(0, Math.min(100, ((na.date - tlStart)/tlSpan)*100));
+    const cls = isNational(c.scope) ? 'natl' : 'intl';
+    markerHtml += `<div class="tl-marker ${cls}" style="left:${pct}%" title="${c.name} — ${na.label}: ${fmtDate(na.date.toISOString().slice(0,10))}" data-idx="${i}"></div>`;
+  });
+  document.getElementById('tlTrack').innerHTML = markerHtml;
+  document.querySelectorAll('.tl-marker').forEach(m=>{
+    m.addEventListener('click', ()=>{
+      const idx = m.getAttribute('data-idx');
+      const el = document.getElementById('card-'+idx);
+      if(el) el.scrollIntoView({behavior:'smooth', block:'center'});
+    });
+  });
+}
+
+// ---------- Filters state ----------
+let state = { scope:'all', cat:'all', quarter:'all', sort:'deadline', q:'' };
+
+const quarterOptions = [{val:'all', label:'All quarters'}].concat(
+  Array.from(new Set(DATA.map(d=>d.quarter).filter(Boolean)))
+    .sort()
+    .map(q=>({val:q, label:shortQuarter(q)}))
+);
+
+function chipRow(container, options, key){
+  container.innerHTML = options.map(o=>
+    `<button class="chip ${state[key]===o.val?'active':''}" data-key="${key}" data-val="${o.val}">${o.label}</button>`
+  ).join('');
+}
+chipRow(document.getElementById('scopeFilters'), [
+  {val:'all', label:'All scope'}, {val:'intl', label:'International'}, {val:'natl', label:'National (Egypt)'}
+], 'scope');
+chipRow(document.getElementById('catFilters'), [
+  {val:'all', label:'All tracks'}, {val:'Academic', label:'Academic'}, {val:'Industrial', label:'Industrial'}
+], 'cat');
+chipRow(document.getElementById('quarterFilters'), quarterOptions, 'quarter');
+chipRow(document.getElementById('sortFilters'), [
+  {val:'deadline', label:'Sort: nearest deadline'}, {val:'az', label:'Sort: A–Z'}
+], 'sort');
+
+document.querySelectorAll('.chip').forEach(btn=>{
+  btn.addEventListener('click', ()=>{
+    const key = btn.getAttribute('data-key');
+    state[key] = btn.getAttribute('data-val');
+    render();
+  });
+});
+document.getElementById('searchInput').addEventListener('input', (e)=>{
+  state.q = e.target.value.toLowerCase();
+  render();
+});
+
+// ---------- Card rendering ----------
+function joinClass(joined){
+  switch(joined){
+    case 'Joined': return 'j-joined';
+    case 'Registered / In Progress': return 'j-registered';
+    case 'Considering': return 'j-considering';
+    case 'Declined': return 'j-declined';
+    default: return 'j-notjoined';
+  }
+}
+
+async function setJoined(idx, value){
+  DATA[idx].joined = value;
+  // Try persistent storage if the host environment supports it; otherwise this
+  // just updates the in-memory session state (resets on reload/re-download).
+  try{
+    if(window.storage && typeof window.storage.set === 'function'){
+      await window.storage.set('joined:'+idx, value, false);
+    }
+  }catch(e){ /* no persistent storage available in this context — session-only */ }
+  refreshJoinedKpi();
+  render();
+}
+
+async function loadJoinedState(){
+  try{
+    if(window.storage && typeof window.storage.get === 'function'){
+      for(let i=0;i<DATA.length;i++){
+        try{
+          const res = await window.storage.get('joined:'+i, false);
+          if(res && res.value) DATA[i].joined = res.value;
+        }catch(e){ /* key not set yet */ }
+      }
+    }
+  }catch(e){ /* no persistent storage available */ }
+}
+
+function shortQuarter(q){
+  const m = q.match(/Quarter \((\d)\)/);
+  if(!m) return q;
+  const monthMap = {'1':'Jan–Mar', '2':'Apr–Jun', '3':'Jul–Sep', '4':'Oct–Dec'};
+  return `Q${m[1]} · ${monthMap[m[1]]}`;
+}
+
+function statusBadgeClass(status){
+  const s = (status||'').toLowerCase();
+  if(s.includes('unconfirmed') || s.includes('halt') || s.includes('newly launched')) return 'status-tba';
+  if(s.includes('open') || s.includes('confirmed')) return 'status-open';
+  if(s.includes('closed') || s.includes('concluded')) return 'status-closed';
+  return 'status-closed';
+}
+
+function cardHtml(c, idx){
+  const natl = isNational(c.scope);
+  const ribbonCls = natl ? 'natl' : 'intl';
+  const na = nextAction(c);
+  const days = na ? daysFrom(na.date) : null;
+
+  const factRows = `
+    <div class="fact"><span class="k">Eligibility</span><span class="v">${c.eligibility}</span></div>
+    <div class="fact"><span class="k">Team size</span><span class="v">${c.teamSize}</span></div>
+    <div class="fact"><span class="k">Location</span><span class="v">${c.location}</span></div>
+    <div class="fact"><span class="k">Field</span><span class="v">${c.field}</span></div>
+  `;
+
+  const dispVal = (dateVal, note) => dateVal ? fmtDate(dateVal) : (note || '—');
+
+  const tmParts = [];
+  if(c.regOpens || c.regOpensNote){
+    tmParts.push(`<div class="tm-item"><span class="k">Reg. opens</span><span class="v">${dispVal(c.regOpens, c.regOpensNote)}</span></div>`);
+  }
+  if(c.regDeadline || c.regDeadlineNote){
+    tmParts.push(`<div class="tm-item"><span class="k">Reg. deadline</span><span class="v">${dispVal(c.regDeadline, c.regDeadlineNote)}</span></div>`);
+  }
+  if(c.eventStart || c.eventEnd || c.eventNote){
+    let evtLabel;
+    if(c.eventStart && c.eventEnd && c.eventStart!==c.eventEnd) evtLabel = `${fmtDate(c.eventStart)} – ${fmtDate(c.eventEnd)}`;
+    else if(c.eventStart) evtLabel = fmtDate(c.eventStart);
+    else evtLabel = c.eventNote || '—';
+    tmParts.push(`<div class="tm-item"><span class="k">Event dates</span><span class="v">${evtLabel}</span></div>`);
+  }
+
+  return `
+  <div class="card" id="card-${idx}">
+    <div class="ribbon ${ribbonCls}">
+      ${days!==null ? `<div class="days">${days}</div><div class="days-lbl">days · ${na.label}</div>` : `<div class="days" style="font-size:15px;">—</div><div class="days-lbl">no 2026 dates left</div>`}
+      <div class="scope-lbl">${natl ? 'National' : 'International'}</div>
+    </div>
+    <div class="card-body">
+      <div class="card-top">
+        <div>
+          <p class="card-title">${c.name}</p>
+          <p class="card-org">${c.organizer}</p>
+        </div>
+        <div class="badges">
+          <span class="badge cat-${(c.category||'').toLowerCase()}">${c.category}</span>
+          ${c.quarter ? `<span class="badge quarter-badge">${shortQuarter(c.quarter)}</span>` : ''}
+          <span class="badge ${statusBadgeClass(c.status)}">${c.status}</span>
+        </div>
+      </div>
+      <p class="desc">${c.description}</p>
+      <div class="fact-grid">${factRows}</div>
+      <div class="timeline-mini">${tmParts.join('')}</div>
+      <div class="card-foot">
+        <p class="prize">Prize: <strong>${c.prize}</strong></p>
+        <div style="display:flex;gap:10px;align-items:center;">
+          <select class="join-select ${joinClass(c.joined)}" data-idx="${idx}" onchange="setJoined(${idx}, this.value)">
+            ${['Not Joined','Considering','Registered / In Progress','Joined','Declined'].map(opt=>
+              `<option value="${opt}" ${c.joined===opt?'selected':''}>${opt==='Not Joined'?'Did we join? — Not Joined':opt}</option>`
+            ).join('')}
+          </select>
+          <a class="visit-link" href="${c.website}" target="_blank" rel="noopener">Visit official site →</a>
+        </div>
+      </div>
+    </div>
+  </div>`;
+}
+
+function render(){
+  let items = DATA.map((c,i)=>({c,i}));
+
+  if(state.scope==='intl') items = items.filter(x=>x.c.scope.startsWith('International'));
+  if(state.scope==='natl') items = items.filter(x=>isNational(x.c.scope));
+  if(state.cat!=='all') items = items.filter(x=>x.c.category===state.cat);
+  if(state.quarter!=='all') items = items.filter(x=>x.c.quarter===state.quarter);
+  if(state.q){
+    items = items.filter(x=>{
+      const hay = (x.c.name+' '+x.c.field+' '+x.c.organizer+' '+x.c.description).toLowerCase();
+      return hay.indexOf(state.q) !== -1;
+    });
+  }
+
+  if(state.sort==='deadline'){
+    items.sort((a,b)=>{
+      const na1 = nextAction(a.c), na2 = nextAction(b.c);
+      const d1 = na1 ? na1.date : new Date('2099-01-01');
+      const d2 = na2 ? na2.date : new Date('2099-01-01');
+      return d1 - d2;
+    });
+  } else {
+    items.sort((a,b)=>a.c.name.localeCompare(b.c.name));
+  }
+
+  document.getElementById('resultHint').textContent = `${items.length} of ${total} shown`;
+  document.getElementById('cardContainer').innerHTML = items.map(x=>cardHtml(x.c, x.i)).join('');
+  document.getElementById('emptyState').style.display = items.length===0 ? 'block' : 'none';
+
+  // re-render chip active states
+  chipRow(document.getElementById('scopeFilters'), [
+    {val:'all', label:'All scope'}, {val:'intl', label:'International'}, {val:'natl', label:'National (Egypt)'}
+  ], 'scope');
+  chipRow(document.getElementById('catFilters'), [
+    {val:'all', label:'All tracks'}, {val:'Academic', label:'Academic'}, {val:'Industrial', label:'Industrial'}
+  ], 'cat');
+  chipRow(document.getElementById('quarterFilters'), quarterOptions, 'quarter');
+  chipRow(document.getElementById('sortFilters'), [
+    {val:'deadline', label:'Sort: nearest deadline'}, {val:'az', label:'Sort: A–Z'}
+  ], 'sort');
+  document.querySelectorAll('.chip').forEach(btn=>{
+    btn.addEventListener('click', ()=>{
+      const key = btn.getAttribute('data-key');
+      state[key] = btn.getAttribute('data-val');
+      render();
+    });
+  });
+}
+
+(async function init(){
+  await loadJoinedState();
+  updateLiveDateTag();
+  refreshJoinedKpi();
+  renderTimeline();
+  render();
+
+  // Keep the countdown accurate if the tab is left open: re-check the date
+  // every hour, and re-render whenever the calendar day actually changes.
+  setInterval(()=>{
+    const fresh = getToday();
+    if(fresh.getTime() !== TODAY.getTime()){
+      TODAY = fresh;
+      updateLiveDateTag();
+      renderTimeline();
+      render();
+    }
+  }, 60 * 60 * 1000);
+})();
+</script>
+
+</body>
+</html>
